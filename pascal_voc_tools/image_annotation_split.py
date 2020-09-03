@@ -115,7 +115,7 @@ class SplitImageAnnotation():
 
             # init sub xml info
             sub_xml_info = {
-                'path': xml_info['path'],
+                'path': xml_info.get('path', str(os.path.join(xml_info['folder'],xml_info['filename']))),
                 'filename': xml_info['filename'],
                 'folder': xml_info['folder'],
                 'size':{'width': int(xmax) - int(xmin),
