@@ -101,7 +101,7 @@ class SplitImageAnnotation():
             subimages.append(image[bbox[1]:bbox[3], bbox[0]:bbox[2]])
         return subimages
 
-    def split_annotations(self, xml_info, split_bboxes, iou_thresh=0.7):
+    def split_annotations(self, xml_info, split_bboxes, iou_thresh=0.05):
         """Using split_bboxes to split an xml file.
         Arguments:
             xml_info: dict, all info about a xml.
@@ -118,37 +118,31 @@ class SplitImageAnnotation():
                 'path': xml_info['path'],
                 'filename': xml_info['filename'],
                 'folder': xml_info['folder'],
-                'width': int(xmax) - int(xmin),
-                'height': int(ymax) - int(ymin),
-                'depth': xml_info['depth'],
-                'database': xml_info['database'],
+                'size':{'width': int(xmax) - int(xmin),
+                        'height': int(ymax) - int(ymin),
+                        'depth': xml_info['size']['depth']},
+                'source':{'database': xml_info['source'].get('database', 'Unknown')},
                 'segmented': xml_info['segmented'],
-                'objects': []
+                'object': []
             }
 
-            for bbox_info in xml_info['objects']:
-                ob_xmin, ob_ymin, ob_xmax, ob_ymax = bbox_info[
-                    'xmin'], bbox_info['ymin'], bbox_info['xmax'], bbox_info[
-                        'ymax'],
+            for bbox_info in xml_info['object']:
+                ob_xmin = int(float(bbox_info['bndbox']['xmin']))
+                ob_ymin = int(float(bbox_info['bndbox']['ymin']))
+                ob_xmax = int(float(bbox_info['bndbox']['xmax']))
+                ob_ymax = int(float(bbox_info['bndbox']['ymax']))
+                
                 if iou([ob_xmin, ob_ymin, ob_xmax, ob_ymax],
                        [xmin, ymin, xmax, ymax]) > iou_thresh:
-                    sub_xml_info['objects'].append({
-                        'name':
-                        bbox_info['name'],
-                        'xmin':
-                        max(ob_xmin - xmin, 1),
-                        'ymin':
-                        max(ob_ymin - ymin, 1),
-                        'xmax':
-                        min(ob_xmax - xmin, xmax - xmin - 1),
-                        'ymax':
-                        min(ob_ymax - ymin, ymax - ymin - 1),
-                        'pose':
-                        bbox_info['pose'],
-                        'truncated':
-                        bbox_info['truncated'],
-                        'difficult':
-                        bbox_info['difficult'],
+                    sub_xml_info['object'].append({
+                        'name': bbox_info['name'],
+                        'bndbox': {'xmin': max(ob_xmin - xmin, 1),
+                                   'ymin': max(ob_ymin - ymin, 1),
+                                   'xmax': min(ob_xmax - xmin, xmax - xmin - 1),
+                                   'ymax': min(ob_ymax - ymin, ymax - ymin - 1)},
+                        'pose': bbox_info.get('pose', 'Unspecified'),
+                        'truncated': bbox_info.get('truncated', 0),
+                        'difficult': bbox_info.get('difficult', 0),
                     })
             subannotations.append(sub_xml_info)
 
