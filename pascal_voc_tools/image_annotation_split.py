@@ -157,9 +157,9 @@ class SplitImageAnnotation():
             print('{}: split image: {}\t\t\t'.format(
                 index, os.path.basename(jpg_path)),
                   end='\r')
-            images, xml_writers = self.split_image_annotations(
+            images, xml_annotations_list = self.split_image_annotations(
                 jpg_path, xml_path)
-            for i, (image, xml_writer) in enumerate(zip(images, xml_writers)):
+            for i, (image, xml_annotations) in enumerate(zip(images, xml_annotations_list)):
                 save_xml_path = os.path.join(
                     self.save_xml_dir,
                     os.path.basename(xml_path).replace(
@@ -169,6 +169,11 @@ class SplitImageAnnotation():
                     os.path.basename(jpg_path).replace(
                         '.jpg', '_{:0>2d}.jpg'.format(i)))
                 cv2.imwrite(save_jpg_path, image)
+
+                xml_annotations.filename = pathlib.Path(xml_path).name # Fix the filename
+                
+                xml_writer = XmlParser()
+                xml_writer.template_parameters = xml_annotations 
                 xml_writer.save(save_xml_path,
                                 image_parameters={'path': save_jpg_path})
 
