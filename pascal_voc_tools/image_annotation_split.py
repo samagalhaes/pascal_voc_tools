@@ -100,7 +100,7 @@ class SplitImageAnnotation():
             subimages.append(image[bbox[1]:bbox[3], bbox[0]:bbox[2]])
         return subimages
 
-    def split_annotations(self, xml_info, split_bboxes, iou_thresh=0.05):
+    def split_annotations(self, xml_info, split_bboxes, iou_thresh=0.5):
         """Using split_bboxes to split an xml file.
         Arguments:
             xml_info: dict, all info about a xml.
@@ -132,7 +132,10 @@ class SplitImageAnnotation():
                 ob_ymax = int(float(bbox_info['bndbox']['ymax']))
                 
                 if iou([ob_xmin, ob_ymin, ob_xmax, ob_ymax],
-                       [xmin, ymin, xmax, ymax]) > iou_thresh:
+                       [max(ob_xmin, xmin),
+                        max(ob_ymin, ymin),
+                        min(ob_xmax, xmax),
+                        min(ob_ymax, ymax)]) > iou_thresh:
                     sub_xml_info['object'].append({
                         'name': bbox_info['name'],
                         'bndbox': {'xmin': max(ob_xmin - xmin, 0),

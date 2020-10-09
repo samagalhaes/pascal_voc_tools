@@ -31,8 +31,10 @@ def bb_intersection_over_union(boxA, boxB):
     # compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
     # areas - the interesection area
-    iou = interArea / float(boxAArea + boxBArea - interArea)
+    if float(boxAArea + boxBArea - interArea) <= 0:
+        return -1
 
+    iou = interArea / float(boxAArea + boxBArea - interArea)
     # return the intersection over union value
     return iou
 
