@@ -7,8 +7,7 @@
 @Desc: split image and annotation.
 """
 
-import os
-import glob
+import os, glob, pathlib
 import numpy as np
 import cv2
 
@@ -170,7 +169,7 @@ class SplitImageAnnotation():
                         '.jpg', '_{:0>2d}.jpg'.format(i)))
                 cv2.imwrite(save_jpg_path, image)
 
-                xml_annotations.filename = pathlib.Path(xml_path).name # Fix the filename
+                xml_annotations["filename"] = pathlib.Path(xml_path).stem + '.jpg' # Fix the filename
                 
                 xml_writer = XmlParser()
                 xml_writer.template_parameters = xml_annotations 
