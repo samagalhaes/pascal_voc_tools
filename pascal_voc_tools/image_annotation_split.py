@@ -135,13 +135,14 @@ class SplitImageAnnotation():
                        [xmin, ymin, xmax, ymax]) > iou_thresh:
                     sub_xml_info['object'].append({
                         'name': bbox_info['name'],
-                        'bndbox': {'xmin': max(ob_xmin - xmin, 1),
-                                   'ymin': max(ob_ymin - ymin, 1),
-                                   'xmax': min(ob_xmax - xmin, xmax - xmin - 1),
-                                   'ymax': min(ob_ymax - ymin, ymax - ymin - 1)},
+                        'bndbox': {'xmin': max(ob_xmin - xmin, 0),
+                                   'ymin': max(ob_ymin - ymin, 0),
+                                   'xmax': min(ob_xmax - xmin, xmax - xmin),
+                                   'ymax': min(ob_ymax - ymin, ymax - ymin)},
                         'pose': bbox_info.get('pose', 'Unspecified'),
                         'truncated': bbox_info.get('truncated', 0),
                         'difficult': bbox_info.get('difficult', 0),
+                        'occluded': bbox_info.get('occluded', 0),
                     })
             subannotations.append(sub_xml_info)
 
